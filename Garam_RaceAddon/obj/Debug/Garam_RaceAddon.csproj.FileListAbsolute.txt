@@ -1,0 +1,8 @@
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Garam, Race Addon\1.2\Garam_RaceAddon.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Garam, Race Addon\1.2\Assemblies\Garam_RaceAddon.dll
+C:\Users\서원일\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.csprojAssemblyReference.cache
+C:\Users\서원일\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.csproj.CoreCompileInputs.cache
+C:\Users\서원일\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.dll
+C:\Users\Dalrae\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.csprojAssemblyReference.cache
+C:\Users\Dalrae\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.csproj.CoreCompileInputs.cache
+C:\Users\Dalrae\source\repos\Garam_RaceAddon 1.2\Garam_RaceAddon\obj\Debug\Garam_RaceAddon.dll
