@@ -11,5 +11,6 @@ namespace Garam_RaceAddon
         public bool humanlikeMeat = true;
         public ThingDef recipeImportTarget = null;
         public int maxDamageForSocialfight = 6;
+        public string shortDescriptionForRaceStory = null;
     }
 }

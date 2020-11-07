@@ -132,7 +132,8 @@ namespace Garam_RaceAddon
 
         public void BodyCheck(HediffSet hediffSet)
         {
-            var list = hediffSet.hediffs.FindAll(x => x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedBodyGroup));
+            //var list = hediffSet.hediffs.FindAll(x => x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedBodyGroup));
+            var list = hediffSet.hediffs.FindAll(x => x.Part == null && racomp.torsoDef.linkedBodyGroup == null || x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedBodyGroup));
             if (racomp.torsoDef.bodyPath.customs.FindAll(x => list.Any(y => y.def == x.hediffDef)) is var list2 && list2.Count > 0)
             {
                 list2.Sort((x, y) => y.priority - x.priority);
@@ -152,7 +153,8 @@ namespace Garam_RaceAddon
 
         public void HeadCheck(HediffSet hediffSet)
         {
-            var list = hediffSet.hediffs.FindAll(x => x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedHeadGroup));
+            //var list = hediffSet.hediffs.FindAll(x => x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedHeadGroup));
+            var list = hediffSet.hediffs.FindAll(x => x.Part == null && racomp.torsoDef.linkedHeadGroup == null || x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedHeadGroup));
             if (racomp.torsoDef.headPath.customs.FindAll(x => list.Any(y => y.def == x.hediffDef)) is var list2 && list2.Count > 0)
             {
                 list2.Sort((x, y) => y.priority - x.priority);

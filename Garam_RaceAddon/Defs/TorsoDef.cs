@@ -8,8 +8,10 @@ namespace Garam_RaceAddon
     {
         public ShaderTypeDef shaderType;
 
-        public BodyPartGroupDef linkedBodyGroup = BodyPartGroupDefOf.Torso;
-        public BodyPartGroupDef linkedHeadGroup = BodyPartGroupDefOf.FullHead;
+        public BodyPartGroupDef linkedBodyGroup;
+        public BodyPartGroupDef linkedHeadGroup;
+        //public BodyPartGroupDef linkedBodyGroup = BodyPartGroupDefOf.Torso;
+        //public BodyPartGroupDef linkedHeadGroup = BodyPartGroupDefOf.FullHead;
 
         public UniversalPath bodyPath = new UniversalPath();
         public BodyTypeDef bodyType;

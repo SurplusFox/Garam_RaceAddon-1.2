@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using System.Xml;
 using Verse;
 
 namespace Garam_RaceAddon
@@ -8,9 +9,11 @@ namespace Garam_RaceAddon
     {
         public List<WorkTags> workDisables = new List<WorkTags>();
 
-        public List<SkillGain> skillGains = new List<SkillGain>();
+        public List<SkillPair> skillGains = new List<SkillPair>();
 
-        public List<SkillGain> skillLimits = new List<SkillGain>();
+        public List<SkillPair> skillLimits = new List<SkillPair>();
+
+        public List<SkillPair> skillFactors = new List<SkillPair>();
 
         public List<TraitInfo> forcedTraits = new List<TraitInfo>();
 
@@ -18,6 +21,23 @@ namespace Garam_RaceAddon
         public List<ReplacedHediff> replacedHediffs;
 
         public List<ReplacedThought> replacedThoughts;
+    }
+
+    public class SkillPair
+    {
+        public SkillDef skill;
+        public float value;
+
+        public void LoadDataFromXmlCustom(XmlNode xmlRoot)
+        {
+            if (xmlRoot.ChildNodes.Count != 1)
+            {
+                Log.Error("Misconfigured SkillPair: " + xmlRoot.OuterXml);
+                return;
+            }
+            DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, "skill", xmlRoot.Name);
+            value = ParseHelper.FromString<float>(xmlRoot.FirstChild.Value);
+        }
     }
 
     public class TraitInfo

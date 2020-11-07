@@ -292,31 +292,46 @@ namespace Garam_RaceAddon
             if (Mouse.IsOver(rect13))
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append(pawn.def.description.Translate());
                 if (pawn.def is RaceAddonThingDef thingDef)
                 {
-                    stringBuilder.AppendLine();
-                    stringBuilder.AppendLine();
-                    if (thingDef.raceAddonSettings.characterizationSetting.skillGains != null)
+                    if (thingDef.raceAddonSettings.basicSetting.shortDescriptionForRaceStory.NullOrEmpty())
                     {
+                        stringBuilder.AppendLine(pawn.def.description.Translate());
+                    }
+                    else
+                    {
+                        string description = pawn.def.description.Translate().ToString();
+                        int index = description.IndexOf(thingDef.raceAddonSettings.basicSetting.shortDescriptionForRaceStory.Translate());
+                        if (index > 0)
+                        {
+                            stringBuilder.AppendLine(description.Remove(description.IndexOf(thingDef.raceAddonSettings.basicSetting.shortDescriptionForRaceStory)));
+                        }
+                        else
+                        {
+                            stringBuilder.AppendLine(pawn.def.description.Translate());
+                        }
+                    }
+                    if (thingDef.raceAddonSettings.characterizationSetting.skillGains.Count > 0)
+                    {
+                        stringBuilder.AppendLine();
                         List<SkillDef> allDefsListForReading = DefDatabase<SkillDef>.AllDefsListForReading;
                         for (int i = 0; i < allDefsListForReading.Count; i++)
                         {
                             SkillDef skillDef = allDefsListForReading[i];
                             if (thingDef.raceAddonSettings.characterizationSetting.skillGains.Find(x => x.skill == skillDef) is var skill && skill != null)
                             {
-                                stringBuilder.AppendLine(skillDef.skillLabel.CapitalizeFirst() + ":   " + skill.xp.ToString("+##;-##"));
+                                stringBuilder.AppendLine(skillDef.skillLabel.CapitalizeFirst() + ":   " + skill.value.ToString("+##;-##"));
                             }
                         }
-                        stringBuilder.AppendLine();
                     }
                     foreach (WorkTypeDef disabledWorkType in thingDef.DisabledWorkTypes)
                     {
+                        stringBuilder.AppendLine();
                         stringBuilder.AppendLine(disabledWorkType.gerundLabel.CapitalizeFirst() + " " + "DisabledLower".Translate());
                     }
-                    stringBuilder.AppendLine();
                     foreach (WorkGiverDef disabledWorkGiver in thingDef.DisabledWorkGivers)
                     {
+                        stringBuilder.AppendLine();
                         stringBuilder.AppendLine(disabledWorkGiver.workType.gerundLabel.CapitalizeFirst() + ": " + disabledWorkGiver.LabelCap + " " + "DisabledLower".Translate());
                     }
                 }
@@ -847,6 +862,7 @@ namespace Garam_RaceAddon
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes, ILGenerator il)
         {
+            var target_GenerateForcedTraits = codes.ToList().FindAll(x => x.opcode == OpCodes.Ldarga_S && (byte)x.operand == 1)[0];
             var target_Gay = codes.ToList().FindAll(x => x.opcode == OpCodes.Ldsfld && (FieldInfo)x.operand == AccessTools.Field(typeof(TraitDefOf), "Gay"))[0];
             var target_End = codes.ToList().FindAll(x => x.opcode == OpCodes.Callvirt && (MethodInfo)x.operand == AccessTools.Method(typeof(TraitSet), "GainTrait"))[4];
             Label end = il.DefineLabel();
@@ -869,7 +885,8 @@ namespace Garam_RaceAddon
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GenerateTraits), nameof(GenerateTraits.FinalCheck)));
                     yield return new CodeInstruction(OpCodes.Brfalse, end);
                 }
-                if (code.opcode == OpCodes.Call && (MethodInfo)code.operand == AccessTools.Method(typeof(Rand), "RangeInclusive"))
+                //if (code.opcode == OpCodes.Call && (MethodInfo)code.operand == AccessTools.Method(typeof(Rand), "RangeInclusive"))
+                if (code == target_GenerateForcedTraits)
                 {
                     yield return new CodeInstruction(OpCodes.Ldloc_0);
                     yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.FirstInner(typeof(PawnGenerator), x => x.Name.Contains("25_0")).GetField("pawn"));
@@ -1441,9 +1458,9 @@ namespace Garam_RaceAddon
 
         public static int GetMaxLevel(int level, SkillDef def, Pawn pawn)
         {
-            if ((pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillLimits.GetSkillLimit(def) is var set && set != null)
+            if ((pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillLimits.GetSkillPair(def) is var set && set != null)
             {
-                return set.xp;
+                return (int)set.value;
             }
             return level;
         }
@@ -1456,12 +1473,123 @@ namespace Garam_RaceAddon
         [HarmonyPrefix]
         public static bool Prefix(int value, Pawn ___pawn, SkillDef ___def, ref int ___levelInt)
         {
-            if ((___pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillLimits.GetSkillLimit(___def) is var set && set != null)
+            if ((___pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillLimits.GetSkillPair(___def) is var set && set != null)
             {
-                ___levelInt = Mathf.Clamp(value, 0, set.xp);
+                ___levelInt = Mathf.Clamp(value, 0, (int)set.value);
                 return false;
             }
             return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(SkillUI))]
+    [HarmonyPatch("DrawSkill", new[] { typeof(SkillRecord), typeof(Rect), typeof(SkillUI.SkillDrawMode), typeof(string) })]
+    public static class DrawSkill
+    {
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes)
+        {
+            foreach (var code in codes)
+            {
+                yield return code;
+                if (code.opcode == OpCodes.Ldc_R4 && (float)code.operand == 20f)
+                {
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(SkillRecord), "def"));
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(SkillRecord), "pawn"));
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DrawSkill), "GetMaxLevel"));
+                }
+            }
+        }
+
+        public static float GetMaxLevel(float level, SkillDef def, Pawn pawn)
+        {
+            if ((pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillLimits.GetSkillPair(def) is var set && set != null)
+            {
+                return set.value;
+            }
+            return level;
+        }
+    }
+
+    [HarmonyPatch(typeof(SkillRecord))]
+    [HarmonyPatch("LearnRateFactor")]
+    public static class LearnRateFactor
+    {
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes)
+        {
+            foreach (var code in codes)
+            {
+                yield return code;
+                if (code.opcode == OpCodes.Brtrue_S)
+                {
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(SkillRecord), "def"));
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(SkillRecord), "pawn"));
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(LearnRateFactor), "GetSkillFactor"));
+                    yield return new CodeInstruction(OpCodes.Ldloc_0);
+                    yield return new CodeInstruction(OpCodes.Add);
+                    yield return new CodeInstruction(OpCodes.Stloc_0);
+                }
+            }
+        }
+
+        public static float GetSkillFactor(SkillDef def, Pawn pawn)
+        {
+            if ((pawn.def as RaceAddonThingDef)?.raceAddonSettings.characterizationSetting.skillFactors.GetSkillPair(def, true) is var set && set != null)
+            {
+                return set.value;
+            }
+            return 0f;
+        }
+    }
+
+    [HarmonyPatch(typeof(SkillUI))]
+    [HarmonyPatch("GetSkillDescription")]
+    public static class GetSkillDescription
+    {
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes)
+        {
+            foreach (var code in codes)
+            {
+                if (code.opcode == OpCodes.Callvirt && (MethodInfo)code.operand == AccessTools.Method(typeof(SkillRecord), "get_LearningSaturatedToday"))
+                {
+                    yield return new CodeInstruction(OpCodes.Ldloc_0);
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(SkillRecord), "pawn"));
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GetSkillDescription), "SetSkillDescription"));
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                }
+                yield return code;
+            }
+        }
+
+        public static void SetSkillDescription(SkillRecord record, StringBuilder stringBuilder, Pawn pawn)
+        {
+            if (pawn.def is RaceAddonThingDef thingDef)
+            {
+                string value1 = "20";
+                string value2 = "0%";
+                if (thingDef.raceAddonSettings.characterizationSetting.skillLimits.GetSkillPair(record.def, true) is var set1 && set1 != null)
+                {
+                    value1 = set1.value.ToString();
+                }
+                if (thingDef.raceAddonSettings.characterizationSetting.skillFactors.GetSkillPair(record.def, true) is var set2 && set2 != null)
+                {
+                    value2 = set2.value.ToStringPercent("F0");
+                    if (set2.value >= 0)
+                    {
+                        value2 = "+" + value2;
+                    }
+                }
+                stringBuilder.AppendLine("\n" + "RaceAddon_Race".Translate() + ": " + pawn.def.label.Translate());
+                stringBuilder.AppendLine("RaceAddon_SkillLimit".Translate(value1));
+                stringBuilder.Append("RaceAddon_Skill".Translate(value2));
+            }
         }
     }
 }

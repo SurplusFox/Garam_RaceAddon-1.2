@@ -25,6 +25,8 @@ namespace Garam_RaceAddon
             {
                 //pawn.health.AddHediff(HediffDefOf.MissingBodyPart, "tail".GetBodyPartRecord(pawn.RaceProps.body));
                 //pawn.GetComp<RaceAddonComp>().raceAddonGraphicSet.eyeBlinker.ForcedExecution();
+                //Log.Error("skill : " + pawn.skills.skills[0].def.defName);
+                //Log.Error("factor : " + pawn.skills.skills[0].LearnRateFactor());
             }
             return true;
         }

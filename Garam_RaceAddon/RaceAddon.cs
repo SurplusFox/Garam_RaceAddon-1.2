@@ -547,9 +547,9 @@ namespace Garam_RaceAddon
             return DefDatabase<CustomPawnKindDef>.AllDefs.Any(x => x.onlyUsePawnKindDefBackstories.Contains(pawnKindDef));
         }
 
-        public static SkillGain GetSkillLimit(this List<SkillGain> skillLimits, SkillDef def)
+        public static SkillPair GetSkillPair(this List<SkillPair> skillLimits, SkillDef def, bool unlimit = false)
         {
-            if (skillLimits.Find(x => x.skill == def) is var set && set?.xp <= 20)
+            if (skillLimits.Find(x => x.skill == def) is var set && set != null && (unlimit || set.value <= 20f))
             {
                 return set;
             }

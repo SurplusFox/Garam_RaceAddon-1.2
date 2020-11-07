@@ -126,14 +126,14 @@ namespace Garam_RaceAddon
 
                 if (thingDef.raceAddonSettings.characterizationSetting.skillGains.Count > 0)
                 {
-                    foreach (SkillGain skillGain in thingDef.raceAddonSettings.characterizationSetting.skillGains)
+                    foreach (var skillGain in thingDef.raceAddonSettings.characterizationSetting.skillGains)
                     {
-                        pawn.skills.Learn(skillGain.skill, skillGain.xp, true);
+                        pawn.skills.Learn(skillGain.skill, skillGain.value, true);
                         foreach (var skill in pawn.skills.skills)
                         {
                             if (skill.def == skillGain.skill)
                             {
-                                skill.Level += skillGain.xp;
+                                skill.Level += (int)skillGain.value;
                             }
                         }
                     }
