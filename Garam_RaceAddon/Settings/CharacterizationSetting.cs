@@ -17,6 +17,8 @@ namespace Garam_RaceAddon
 
         public List<TraitInfo> forcedTraits = new List<TraitInfo>();
 
+        public List<TraitInfo> additionalTraits = new List<TraitInfo>();
+
         public List<HediffWithChance> forcedHediffs = new List<HediffWithChance>();
         public List<ReplacedHediff> replacedHediffs;
 

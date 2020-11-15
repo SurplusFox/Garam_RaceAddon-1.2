@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Collections.Generic;
 using Verse;
 
 namespace Garam_RaceAddon
@@ -12,5 +13,6 @@ namespace Garam_RaceAddon
         public ThingDef recipeImportTarget = null;
         public int maxDamageForSocialfight = 6;
         public string shortDescriptionForRaceStory = null;
+        public List<BackstoryCategoryFilter> newbornBackstoryCategoryFilters;
     }
 }

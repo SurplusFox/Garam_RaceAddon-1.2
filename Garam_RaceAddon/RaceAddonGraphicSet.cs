@@ -90,11 +90,11 @@ namespace Garam_RaceAddon
 
         public void CheckAgeSetting()
         {
-            var newAgeSetting = (pawn.def as RaceAddonThingDef).raceAddonSettings.ageSettings.GetPresent(pawn);
+            var thingDef = pawn.def as RaceAddonThingDef;
+            var newAgeSetting = thingDef.raceAddonSettings.ageSettings.GetPresent(pawn);
             if (presentAgeSetting != newAgeSetting)
             {
                 presentAgeSetting = newAgeSetting;
-                RaceAddonThingDef thingDef = pawn.def as RaceAddonThingDef;
                 AppearanceDef appearanceDef = presentAgeSetting.appearances?.GetAppearanceDef(pawn, true);
                 if (appearanceDef != null && !presentAgeSetting.keepAppearance)
                 {
@@ -102,6 +102,7 @@ namespace Garam_RaceAddon
                 }
                 racomp.raceAddonGraphicSet = new RaceAddonGraphicSet(pawn, racomp);
                 pawn.Drawer.renderer.graphics.ResolveAllGraphics();
+                /*
                 if (presentAgeSetting.ageBackstory != null && thingDef.raceAddonSettings.ageSettings[thingDef.raceAddonSettings.ageSettings.IndexOf(presentAgeSetting) - 1].ageBackstory.Backstory == pawn.story.childhood)
                 {
                     pawn.story.childhood = presentAgeSetting.ageBackstory.Backstory;
@@ -127,6 +128,7 @@ namespace Garam_RaceAddon
                     pawn.workSettings = new Pawn_WorkSettings(pawn);
                     pawn.workSettings.EnableAndInitialize();
                 }
+                */
             }
         }
 

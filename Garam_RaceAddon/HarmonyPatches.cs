@@ -892,6 +892,12 @@ namespace Garam_RaceAddon
                     yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.FirstInner(typeof(PawnGenerator), x => x.Name.Contains("25_0")).GetField("pawn"));
                     yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GenerateTraits), nameof(GenerateTraits.GenerateForcedTraits)));
                 }
+                if (code.opcode == OpCodes.Call && (MethodInfo)code.operand == AccessTools.Method(typeof(Rand), "RangeInclusive"))
+                {
+                    yield return new CodeInstruction(OpCodes.Ldloc_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.FirstInner(typeof(PawnGenerator), x => x.Name.Contains("25_0")).GetField("pawn"));
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GenerateTraits), nameof(GenerateTraits.GenerateAdditionalTraits)));
+                }
                 if (code == target_End)
                 {
                     yield return new CodeInstruction(OpCodes.Nop) { labels = new List<Label> { end } };
@@ -918,6 +924,28 @@ namespace Garam_RaceAddon
                     }
                 }
             }
+        }
+
+        public static int GenerateAdditionalTraits(int num, Pawn pawn)
+        {
+            if (pawn.def is RaceAddonThingDef thingDef)
+            {
+                foreach (var set in thingDef.raceAddonSettings.characterizationSetting.additionalTraits)
+                {
+                    if (pawn.story.traits.allTraits.Count < num && Rand.Chance(set.chance))
+                    {
+                        if (set.traitDef == null)
+                        {
+                            Log.Error("Null forced trait def on " + thingDef.defName, false);
+                        }
+                        else if (!pawn.story.traits.HasTrait(set.traitDef) && RaceAddon.CheckTrait(pawn.def, new Trait(set.traitDef, set.degree, false)))
+                        {
+                            pawn.story.traits.GainTrait(new Trait(set.traitDef, set.degree, false));
+                        }
+                    }
+                }
+            }
+            return num;
         }
 
         public static bool CheckGay(Pawn pawn)

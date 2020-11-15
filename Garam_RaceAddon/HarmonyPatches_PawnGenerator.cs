@@ -58,11 +58,15 @@ namespace Garam_RaceAddon
                 // Race Addon Comp
                 var racomp = pawn.GetComp<RaceAddonComp>();
                 // Backstory
+                /*
                 if (request.Newborn && factionDef == Find.FactionManager.OfPlayer.def && thingDef.raceAddonSettings.ageSettings[0].ageBackstory != null)
                 {
                     pawn.story.childhood = thingDef.raceAddonSettings.ageSettings[0].ageBackstory.Backstory;
                 }
+                */
+                GiveAppropriateBioAndNameTo.cachedNewborn = request.Newborn;
                 PawnBioAndNameGenerator.GiveAppropriateBioAndNameTo(pawn, request.FixedLastName, factionDef);
+                GiveAppropriateBioAndNameTo.cachedNewborn = false;
                 //SimpleBackstoryDef customBackstoryDef = null;
                 foreach (var backstory in pawn.story.AllBackstories)
                 {
@@ -195,12 +199,45 @@ namespace Garam_RaceAddon
                 }
 
                 TryGenerateNewPawnInternal.cachedSimpleBackstoryDef = null;
-                __result.ChangeKind(cachedOriginalPawnKindDef);
+                if (cachedOriginalPawnKindDef != null)
+                {
+                    __result.ChangeKind(cachedOriginalPawnKindDef);
+                }
                 cachedOriginalPawnKindDef = null;
             }
         }
     }
+    
+    [HarmonyPatch(typeof(PawnBioAndNameGenerator))]
+    [HarmonyPatch("GiveAppropriateBioAndNameTo")]
+    public static class GiveAppropriateBioAndNameTo
+    {
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes)
+        {
+            foreach (var code in codes)
+            {
+                yield return code;
+                if (code.opcode == OpCodes.Call && (MethodInfo)code.operand == AccessTools.Method(typeof(PawnBioAndNameGenerator), "GetBackstoryCategoryFiltersFor"))
+                {
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(GiveAppropriateBioAndNameTo), "GetNewbornBackstoryCategories"));
+                }
+            }
+        }
 
+        public static List<BackstoryCategoryFilter> GetNewbornBackstoryCategories(List<BackstoryCategoryFilter> original, Pawn pawn)
+        {
+            if (cachedNewborn && pawn.IsColonist && pawn.def is RaceAddonThingDef thingDef && thingDef.raceAddonSettings.basicSetting.newbornBackstoryCategoryFilters != null)
+            {
+                return thingDef.raceAddonSettings.basicSetting.newbornBackstoryCategoryFilters;
+            }
+            return original;
+        }
+
+        public static bool cachedNewborn = false;
+    }
+    
     [HarmonyPatch(typeof(PawnBioAndNameGenerator))]
     [HarmonyPatch("GetBackstoryCategoryFiltersFor")]
     public static class GetBackstoryCategoryFiltersFor

@@ -10,7 +10,7 @@ namespace Garam_RaceAddon
     {
         public Verse.Gender gender = Verse.Gender.None;
         public int minAge = 0;
-        public SimpleBackstoryDef ageBackstory;
+        //public SimpleBackstoryDef ageBackstory;
         public DrawSize drawSize = new DrawSize();
         public bool hideHat = false;
         public bool keepAppearance = true;
