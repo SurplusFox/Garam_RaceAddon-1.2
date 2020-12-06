@@ -23,6 +23,7 @@ namespace Garam_RaceAddon
         public string stumpPath;
         public CrownType crownType = CrownType.Average;
 
+        public Rot4ToVector2 headOffsetsCorrection = new Rot4ToVector2();
         public HeadTargetingOffset headTargetingOffsets = new HeadTargetingOffset();
 
         public override void ResolveReferences()

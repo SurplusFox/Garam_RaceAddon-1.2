@@ -26,7 +26,6 @@ namespace Garam_RaceAddon
                     harmony.Patch(methodInfo, null, new HarmonyMethod(typeof(ShouldSkip), "Postfix"), null, null);
                 }
             }
-
             foreach (var thingDef in DefDatabase<RaceAddonThingDef>.AllDefsListForReading)
             {
                 if (thingDef.raceAddonSettings.basicSetting.recipeImportTarget != null)

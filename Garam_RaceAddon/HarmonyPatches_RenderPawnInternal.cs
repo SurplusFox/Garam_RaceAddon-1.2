@@ -353,4 +353,18 @@ namespace Garam_RaceAddon
 		}
 		*/
 	}
+
+	[HarmonyPatch(typeof(PawnRenderer))]
+	[HarmonyPatch("BaseHeadOffsetAt")]
+	public static class BaseHeadOffsetAt
+    {
+		[HarmonyPostfix]
+		public static void Postfix(ref Vector3 __result, Rot4 rotation, Pawn ___pawn)
+		{
+			if (___pawn.def is RaceAddonThingDef && ___pawn.GetComp<RaceAddonComp>() is var racomp)
+			{
+				__result += racomp.torsoDef.headOffsetsCorrection.GetLoc(rotation);
+			}
+		}
+    }
 }
