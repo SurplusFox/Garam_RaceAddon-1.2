@@ -16,7 +16,8 @@ namespace Garam_RaceAddon
         {
             if (pawn.def is RaceAddonThingDef thingDef && pawn.GetComp<RaceAddonComp>() is var racomp && racomp.pawnGeneratedVersion != Mod.ModVersion)
             {
-                Notify("The version in which [" + pawn.Name.ToStringFull + "] was created and the version in the mod do not match. Attempts to fix known bugs.");
+                //Notify("The version in which [" + pawn.Name.ToStringFull + "] was created and the version in the mod do not match. Attempts to fix known bugs.");
+                Notify("({0}) The generated version({1}) and the current version({2}) do not match.".Formatted(pawn.Name.ToStringFull, racomp.pawnGeneratedVersion, Mod.ModVersion));
                 //4.3.0-201208
                 if (racomp.drawSizeDeviation <= 0f)
                 {

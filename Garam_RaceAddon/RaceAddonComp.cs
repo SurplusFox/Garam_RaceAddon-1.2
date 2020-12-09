@@ -11,7 +11,7 @@ namespace Garam_RaceAddon
 {
     public class RaceAddonComp : ThingComp
     {
-        public string pawnGeneratedVersion;
+        public string pawnGeneratedVersion = "0.0.0-000000";
 
         public Pawn Pawn { private set; get; }
 
