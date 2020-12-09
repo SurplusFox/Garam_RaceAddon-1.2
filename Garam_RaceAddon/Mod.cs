@@ -14,7 +14,7 @@ namespace Garam_RaceAddon
     [StaticConstructorOnStartup]
     public static class Mod
     {
-        public const string ModVersion = "4.3.0-201208";
+        public const string ModVersion = "4.3.1-201209";
 
         static Mod()
         {
