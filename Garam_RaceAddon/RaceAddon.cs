@@ -12,6 +12,22 @@ namespace Garam_RaceAddon
 {
     public static class RaceAddon
     {
+        public static void OldVersionBugFixes(Pawn pawn)
+        {
+            if (pawn.def is RaceAddonThingDef thingDef && pawn.GetComp<RaceAddonComp>() is var racomp && racomp.pawnGeneratedVersion != Mod.ModVersion)
+            {
+                Notify("The version in which [" + pawn.Name.ToStringFull + "] was created and the version in the mod do not match. Attempts to fix known bugs.");
+                //4.3.0-201208
+                if (racomp.drawSizeDeviation <= 0f)
+                {
+                    racomp.drawSizeDeviation = 1.0f;
+                }
+
+                //Wrap-up
+                racomp.pawnGeneratedVersion = Mod.ModVersion;
+            }
+        }
+
         public static Dictionary<PawnKindDef, List<Pair<PawnKindDef, float>>> PawnKindDefReplaceSettings { get; set; } = new Dictionary<PawnKindDef, List<Pair<PawnKindDef, float>>>();
 
         public static PawnKindDef GetReplacedPawnKindDef(PawnKindDef key)

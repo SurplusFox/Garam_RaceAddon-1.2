@@ -27,6 +27,7 @@ namespace Garam_RaceAddon
 				RaceAddonComp racomp = ___pawn.GetComp<RaceAddonComp>();
 				Quaternion bodyQuat = Quaternion.AngleAxis(angle, Vector3.up);
 				Quaternion headQuat = bodyQuat;
+				rootLoc.z -= racomp.cachedDrawLocCorrection;
 				Vector3 bodyLoc = rootLoc;
 				Vector3 headLoc = __instance.BaseHeadOffsetAt(bodyFacing);
 				GetModifiedValue(racomp, ref bodyQuat, ref headQuat, ref bodyLoc, ref headLoc, ___pawn, ref renderBody, ref bodyFacing, ref headFacing, portrait);

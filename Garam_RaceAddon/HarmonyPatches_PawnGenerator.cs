@@ -124,6 +124,7 @@ namespace Garam_RaceAddon
                 }
 
                 RaceAddon.SetAppearance(pawn, racomp, thingDef, appearanceDef);
+                racomp.drawSizeDeviation = thingDef.raceAddonSettings.graphicSetting.drawSizeCurve != null ? Rand.ByCurve(thingDef.raceAddonSettings.graphicSetting.drawSizeCurve) : 1.0f;
                 AccessTools.Method(typeof(PawnGenerator), "GenerateTraits").Invoke(null, new object[] { pawn, request });
                 AccessTools.Method(typeof(PawnGenerator), "GenerateBodyType").Invoke(null, new object[] { pawn });
                 AccessTools.Method(typeof(PawnGenerator), "GenerateSkills").Invoke(null, new object[] { pawn });
@@ -142,6 +143,8 @@ namespace Garam_RaceAddon
                         }
                     }
                 }
+
+                racomp.pawnGeneratedVersion = Mod.ModVersion;
 
                 return false;
             }

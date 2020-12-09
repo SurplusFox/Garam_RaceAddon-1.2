@@ -11,7 +11,12 @@ namespace Garam_RaceAddon
 {
     public class RaceAddonComp : ThingComp
     {
+        public string pawnGeneratedVersion;
+
         public Pawn Pawn { private set; get; }
+
+        public float drawSizeDeviation = 1.0f;
+        public float cachedDrawLocCorrection = 0f;
 
         public Color skinColor_Main = Color.clear;
         public Color skinColor_Sub = Color.clear;
@@ -44,11 +49,16 @@ namespace Garam_RaceAddon
         {
             base.PostSpawnSetup(respawningAfterLoad);
             Pawn = parent as Pawn;
+            RaceAddon.OldVersionBugFixes(Pawn);
         }
 
         public override void PostExposeData()
         {
             base.PostExposeData();
+            Scribe_Values.Look(ref pawnGeneratedVersion, "pawnGeneratedVersion");
+
+            Scribe_Values.Look(ref drawSizeDeviation, "drawSizeDeviation");
+
             Scribe_Values.Look(ref skinColor_Main, "skinColor_Main");
             Scribe_Values.Look(ref skinColor_Sub, "skinColor_Sub");
             Scribe_Defs.Look(ref torsoDef, "torsoDef");

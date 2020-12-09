@@ -49,9 +49,14 @@ namespace Garam_RaceAddon
 
                 presentAgeSetting = thingDef.raceAddonSettings.ageSettings.GetPresent(pawn);
 
-                headMeshSet = new GraphicMeshSet(1.5f * presentAgeSetting.drawSize.head.x, 1.5f * presentAgeSetting.drawSize.head.y);
-                bodyMeshSet = new GraphicMeshSet(1.5f * presentAgeSetting.drawSize.body.x, 1.5f * presentAgeSetting.drawSize.body.y);
+                headMeshSet = new GraphicMeshSet((1.5f * presentAgeSetting.drawSize.head.x) * racomp.drawSizeDeviation, (1.5f * presentAgeSetting.drawSize.head.y) * racomp.drawSizeDeviation);
+                bodyMeshSet = new GraphicMeshSet((1.5f * presentAgeSetting.drawSize.body.x) * racomp.drawSizeDeviation, (1.5f * presentAgeSetting.drawSize.body.y) * racomp.drawSizeDeviation);
                 //equipmentMeshSet = new GraphicMeshSet(presentAgeSetting.drawSize.equipment.x, presentAgeSetting.drawSize.equipment.y);
+                racomp.cachedDrawLocCorrection = 0f;
+                if (thingDef.raceAddonSettings.graphicSetting.footPositionCorrection_DrawSize)
+                    racomp.cachedDrawLocCorrection += (1.5f - (1.5f * presentAgeSetting.drawSize.body.y)) / 2f;
+                if (thingDef.raceAddonSettings.graphicSetting.footPositionCorrection_DrawSizeCurve)
+                    racomp.cachedDrawLocCorrection += (1.5f - (1.5f * racomp.drawSizeDeviation)) / 2f;
 
                 eyeBlinker = thingDef.raceAddonSettings.graphicSetting.eyeBlink ? new EyeBlinker() : null;
                 headRotator = thingDef.raceAddonSettings.graphicSetting.headAnimation ? new HeadRotator() : null;
@@ -102,6 +107,10 @@ namespace Garam_RaceAddon
                 }
                 racomp.raceAddonGraphicSet = new RaceAddonGraphicSet(pawn, racomp);
                 pawn.Drawer.renderer.graphics.ResolveAllGraphics();
+                if (pawn.IsColonist)
+                {
+                    Find.LetterStack.ReceiveLetter("RaceAddon_GrowUp_Label".Translate(pawn.Name.ToStringShort), "RaceAddon_GrowUp_String".Translate(), LetterDefOf.PositiveEvent);
+                }
                 /*
                 if (presentAgeSetting.ageBackstory != null && thingDef.raceAddonSettings.ageSettings[thingDef.raceAddonSettings.ageSettings.IndexOf(presentAgeSetting) - 1].ageBackstory.Backstory == pawn.story.childhood)
                 {

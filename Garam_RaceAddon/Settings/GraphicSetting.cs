@@ -21,6 +21,9 @@ namespace Garam_RaceAddon
         public List<ThingDef> drawHat_Exceptions = new List<ThingDef>();
         public bool drawHair = true;
         public List<DrawHairOption> drawHair_Exceptions = new List<DrawHairOption>();
+        public SimpleCurve drawSizeCurve;
+        public bool footPositionCorrection_DrawSize = false;
+        public bool footPositionCorrection_DrawSizeCurve = true;
     }
 
     public class DrawHairOption

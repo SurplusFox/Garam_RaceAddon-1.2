@@ -14,6 +14,8 @@ namespace Garam_RaceAddon
     [StaticConstructorOnStartup]
     public static class Mod
     {
+        public const string ModVersion = "4.3.0-201208";
+
         static Mod()
         {
             Harmony harmony = new Harmony("com.rimworld.Dalrae.Garam_RaceAddon");
