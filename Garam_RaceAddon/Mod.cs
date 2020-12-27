@@ -77,4 +77,10 @@ namespace Garam_RaceAddon
             return !recipe.targetsBodyPart || recipe.appliedOnFixedBodyParts.NullOrEmpty() || recipe.appliedOnFixedBodyParts.Any(def => body.AllParts.Any(bpr => bpr.def == def));
         }
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class GaramTexturePath : Attribute
+    {
+
+    }
 }

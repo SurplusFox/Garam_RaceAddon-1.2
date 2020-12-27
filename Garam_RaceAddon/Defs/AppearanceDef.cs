@@ -72,8 +72,10 @@ namespace Garam_RaceAddon
     public class UniversalPath
     {
         [NoTranslate]
+        [GaramTexturePath]
         public string normal;
         [NoTranslate]
+        [GaramTexturePath]
         public string damaged;
         public List<CustomPath> customs = new List<CustomPath>();
     }
@@ -82,6 +84,7 @@ namespace Garam_RaceAddon
     {
         public HediffDef hediffDef;
         [NoTranslate]
+        [GaramTexturePath]
         public string path;
         public int priority = 0;
     }

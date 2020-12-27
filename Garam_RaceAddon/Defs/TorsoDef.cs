@@ -18,8 +18,10 @@ namespace Garam_RaceAddon
 
         public UniversalPath headPath = new UniversalPath();
         [NoTranslate]
+        [GaramTexturePath]
         public string skullPath;
         [NoTranslate]
+        [GaramTexturePath]
         public string stumpPath;
         public CrownType crownType = CrownType.Average;
 

@@ -14,6 +14,7 @@ using Verse.AI;
 
 namespace Garam_RaceAddon
 {
+    /*
     [HarmonyPatch(typeof(Selector))]
     [HarmonyPatch("Select")]
     public static class TestGround
@@ -40,4 +41,5 @@ namespace Garam_RaceAddon
             }
         }
     }
+    */
 }

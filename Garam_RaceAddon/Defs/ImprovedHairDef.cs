@@ -7,6 +7,8 @@ namespace Garam_RaceAddon
     {
         public ShaderTypeDef shaderType;
 
+        [NoTranslate]
+        [GaramTexturePath]
         public string lowerPath;
 
         public bool drawnInBed = false;
