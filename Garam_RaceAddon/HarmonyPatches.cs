@@ -1116,7 +1116,7 @@ namespace Garam_RaceAddon
                 }
                 racomp.raceAddonGraphicSet.upperFaceGraphic?.Update(___pawn.health.hediffSet);
                 racomp.raceAddonGraphicSet.lowerFaceGraphic?.Update(___pawn.health.hediffSet);
-                racomp.raceAddonGraphicSet.addonGraphics.ForEach(x => x.Update(___pawn.health.hediffSet, hediff));
+                racomp.raceAddonGraphicSet.addonGraphics.ForEach(x => x.Update(___pawn.health.hediffSet));
             }
         }
     }
@@ -1367,7 +1367,7 @@ namespace Garam_RaceAddon
 
     [HarmonyPatch(typeof(WorkGiver_Researcher))]
     [HarmonyPatch("ShouldSkip")]
-    public static class ShouldSkip_B
+    public static class ShouldSkip_Br
     {
         [HarmonyPostfix]
         public static void Postfix(Pawn pawn, ref bool __result)
@@ -1388,21 +1388,22 @@ namespace Garam_RaceAddon
     public static class DrawLeftRect
     {
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codes)
         {
-            var info = AccessTools.Field(typeof(SoundDefOf), "ResearchStart");
-            foreach (CodeInstruction instruction in instructions)
+            var info1 = AccessTools.Field(typeof(SoundDefOf), "ResearchStart");
+            foreach (CodeInstruction code in codes)
             {
-                if (instruction.opcode == OpCodes.Ldsfld && (FieldInfo)instruction.operand == info)
+                if (code.opcode == OpCodes.Ldsfld && (FieldInfo)code.operand == info1)
                 {
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
                     yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(MainTabWindow_Research), "selectedProject"));
-                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DrawLeftRect), "NoRaceWarning"));
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(DrawLeftRect), nameof(DrawLeftRect.NoRaceWarning)));
                 }
-                yield return instruction;
+                yield return code;
             }
         }
-        public static void NoRaceWarning(ResearchProjectDef def)    
+
+        public static void NoRaceWarning(ResearchProjectDef def)
         {
             if (!PawnsFinder.AllMaps_FreeColonistsSpawned.Any((Pawn x) => RaceAddon.CheckResearch(x.def, def)))
             {
@@ -1451,11 +1452,13 @@ namespace Garam_RaceAddon
             if (pawn != null && target.Thing != null)
             {
                 var thing = target.Thing;
-                if (thing is Apparel apparel && !RaceAddon.CheckApparel(pawn, apparel.def) && __result.Label == "ForceWear".Translate(apparel.LabelShort, apparel))
+                //if (thing is Apparel apparel && !RaceAddon.CheckApparel(pawn, apparel.def) && __result.Label == "ForceWear".Translate(apparel.LabelShort, apparel))
+                if (thing is Apparel apparel && !RaceAddon.CheckApparel(pawn, apparel.def))
                 {
                     __result = new FloatMenuOption("CannotWear".Translate(apparel.Label, apparel) + " (" + "RaceAddon_FloatMenu".Translate() + ")", null);
                 }
-                if (thing.TryGetComp<CompEquippable>() != null && !RaceAddon.CheckWeapon(pawn.def, thing.def) && __result.Label.Contains("Equip".Translate(thing.LabelShort)))
+                //if (thing.TryGetComp<CompEquippable>() != null && !RaceAddon.CheckWeapon(pawn.def, thing.def) && __result.Label.Contains("Equip".Translate(thing.LabelShort)))
+                if (thing.TryGetComp<CompEquippable>() != null && !RaceAddon.CheckWeapon(pawn.def, thing.def))
                 {
                     __result = new FloatMenuOption("CannotEquip".Translate(thing.LabelShort) + " (" + "RaceAddon_FloatMenu".Translate() + ")", null);
                 }

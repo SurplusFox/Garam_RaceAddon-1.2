@@ -556,7 +556,8 @@ namespace Garam_RaceAddon
 
         public static SimpleBackstoryDef GetDef(this Backstory backstory)
         {
-            return DefDatabase<SimpleBackstoryDef>.AllDefsListForReading.Find(x => x.Backstory == backstory);
+            return DefDatabase<SimpleBackstoryDef>.AllDefs.FirstOrDefault(x => x.Backstory == backstory);
+            //return DefDatabase<SimpleBackstoryDef>.AllDefsListForReading.Find(x => x.Backstory == backstory);
         }
 
         public static bool OnlyUsePawnKindDefBackstories(this PawnKindDef pawnKindDef)

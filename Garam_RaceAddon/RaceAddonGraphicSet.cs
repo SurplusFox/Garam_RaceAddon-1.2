@@ -86,8 +86,9 @@ namespace Garam_RaceAddon
         public void Update_Rare()
         {
             CheckAgeSetting();
-            BodyCheck(pawn.health.hediffSet);
-            HeadCheck(pawn.health.hediffSet);
+            //BodyCheck(pawn.health.hediffSet);
+            //HeadCheck(pawn.health.hediffSet);
+            TorsoCheck(pawn.health.hediffSet);
             upperFaceGraphic?.Check(pawn.health.hediffSet);
             lowerFaceGraphic?.Check(pawn.health.hediffSet);
             addonGraphics.ForEach(x => x.Check(pawn.health.hediffSet));
@@ -140,7 +141,7 @@ namespace Garam_RaceAddon
                 */
             }
         }
-
+        /*
         public void BodyCheck(HediffSet hediffSet)
         {
             //var list = hediffSet.hediffs.FindAll(x => x.Part != null && x.Part.IsInGroup(racomp.torsoDef.linkedBodyGroup));
@@ -153,12 +154,6 @@ namespace Garam_RaceAddon
                     ResolveAllGraphics.RenewalBodyGraphic(pawn.Drawer.renderer.graphics, list2[0].path, racomp.torsoDef.shaderType.Shader, racomp, (pawn.def as RaceAddonThingDef).raceAddonSettings.graphicSetting.rottingColor);
                     lastBodyHediffDef = list2[0].hediffDef;
                 }
-            }
-            if (bodyDamaged && !list.Any(x => x is Hediff_Injury))
-            {
-                ResolveAllGraphics.RenewalBodyGraphic(pawn.Drawer.renderer.graphics, racomp.torsoDef.bodyPath.normal, racomp.torsoDef.shaderType.Shader, racomp, (pawn.def as RaceAddonThingDef).raceAddonSettings.graphicSetting.rottingColor);
-                bodyDamaged = false;
-                //Log.Error("[body] 상처가 제거됨, 몸통 그래픽 normal로 변경, 현재 bodyDamaged : " + racomp.raceAddonGraphicSet.bodyDamaged);
             }
         }
 
@@ -175,12 +170,31 @@ namespace Garam_RaceAddon
                     lastHeadHediffDef = list2[0].hediffDef;
                 }
             }
-            if (headDamaged && !list.Any(x => x is Hediff_Injury))
+        }
+        */
+        public void TorsoCheck(HediffSet hediffSet)
+        {
+            if (racomp.torsoDef.headPath.customs.FindAll(x => hediffSet.HasHediff(x.hediffDef, null)) is var headList && headList.Count > 0)
             {
-                ResolveAllGraphics.RenewalHeadGraphic(pawn.Drawer.renderer.graphics, racomp.torsoDef.headPath.normal, racomp.torsoDef.shaderType.Shader, racomp, (pawn.def as RaceAddonThingDef).raceAddonSettings.graphicSetting.rottingColor);
-                headDamaged = false;
-                //Log.Error("[head] 상처가 제거됨, 머리 그래픽 normal로 변경, 현재 headDamaged : " + racomp.raceAddonGraphicSet.headDamaged);
+                headList.Sort((x, y) => y.priority - x.priority);
+                if (headList[0].hediffDef != lastHeadHediffDef)
+                {
+                    ResolveAllGraphics.RenewalHeadGraphic(pawn.Drawer.renderer.graphics, headList[0].path, racomp.torsoDef.shaderType.Shader, racomp, (pawn.def as RaceAddonThingDef).raceAddonSettings.graphicSetting.rottingColor);
+                    lastHeadHediffDef = headList[0].hediffDef;
+                }
             }
+            if (racomp.torsoDef.bodyPath.customs.FindAll(x => hediffSet.HasHediff(x.hediffDef, null)) is var bodyList && bodyList.Count > 0)
+            {
+                bodyList.Sort((x, y) => y.priority - x.priority);
+                if (bodyList[0].hediffDef != lastBodyHediffDef)
+                {
+                    ResolveAllGraphics.RenewalHeadGraphic(pawn.Drawer.renderer.graphics, bodyList[0].path, racomp.torsoDef.shaderType.Shader, racomp, (pawn.def as RaceAddonThingDef).raceAddonSettings.graphicSetting.rottingColor);
+                    lastBodyHediffDef = bodyList[0].hediffDef;
+                }
+            }
+            var injuredParts = hediffSet.GetInjuredParts();
+            bodyDamaged = injuredParts.Any(x => x.IsInGroup(racomp.torsoDef.linkedBodyGroup));
+            headDamaged = injuredParts.Any(x => x.IsInGroup(racomp.torsoDef.linkedHeadGroup));
         }
     }
     public class FaceGraphicRecord
@@ -266,7 +280,7 @@ namespace Garam_RaceAddon
             {
                 return sleeping.MatAt(rot);
             }
-            if (attacking != null && pawn.IsFighting())
+            if (attacking != null && pawn.CurJobDef != JobDefOf.Wait_Combat && pawn.IsFighting())
             {
                 return attacking.MatAt(rot);
             }
@@ -341,7 +355,7 @@ namespace Garam_RaceAddon
             damagedRotting = data.addonDef.addonPath.damaged.GetGraphic(shader, rottingColor, Color.clear);
         }
 
-        public void Update(HediffSet hediffSet, Hediff hediff = null)
+        public void Update(HediffSet hediffSet)
         {
             foreach (var custom in data.addonDef.addonPath.customs)
             {
@@ -352,9 +366,9 @@ namespace Garam_RaceAddon
                     break;
                 }
             }
-            if (hediff != null)
+            if (linkedBodyPart != null)
             {
-                partDamaged = linkedBodyPart != null && hediff is Hediff_Injury && hediff.Part == linkedBodyPart;
+                partDamaged = hediffSet.GetInjuredParts().Contains(linkedBodyPart);
             }
         }
 
@@ -366,9 +380,9 @@ namespace Garam_RaceAddon
                 customRotting = new Pair<CustomPath, Graphic>();
                 Update(hediffSet);
             }
-            if (partDamaged)
+            if (partDamaged && linkedBodyPart != null)
             {
-                partDamaged = linkedBodyPart != null && hediffSet.hediffs.Any(x => x is Hediff_Injury && x.Part == linkedBodyPart);
+                partDamaged = hediffSet.GetInjuredParts().Contains(linkedBodyPart);
             }
         }
 

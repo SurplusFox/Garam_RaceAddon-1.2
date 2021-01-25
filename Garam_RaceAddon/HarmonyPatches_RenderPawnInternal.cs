@@ -236,14 +236,14 @@ namespace Garam_RaceAddon
 					}
 				}
 			}
+			if (!portrait && headAnimation)
+			{
+				racomp.torsoDef.headTargetingOffsets.Correction(ref headLoc, bodyFacing, headFacing);
+			}
 			if (portrait || renderBody)
 			{
 				headLoc.x *= racomp.raceAddonGraphicSet.presentAgeSetting.drawSize.head.x;
 				headLoc.z *= racomp.raceAddonGraphicSet.presentAgeSetting.drawSize.head.y;
-			}
-			if (!portrait && headAnimation)
-			{
-				racomp.torsoDef.headTargetingOffsets.Correction(ref headLoc, bodyFacing, headFacing);
 			}
 			headLoc = bodyLoc + (bodyQuat * headLoc);
 		}

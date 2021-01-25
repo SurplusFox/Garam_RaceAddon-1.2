@@ -36,8 +36,6 @@ namespace Garam_RaceAddon
             }
         }
 
-        internal static SimpleBackstoryDef cachedSimpleBackstoryDef = null;
-
         public static bool RaceAddonGenerator(Pawn pawn, ref PawnGenerationRequest request)
         {
             if (pawn.def is RaceAddonThingDef thingDef)
@@ -67,45 +65,47 @@ namespace Garam_RaceAddon
                 GiveAppropriateBioAndNameTo.cachedNewborn = request.Newborn;
                 PawnBioAndNameGenerator.GiveAppropriateBioAndNameTo(pawn, request.FixedLastName, factionDef);
                 GiveAppropriateBioAndNameTo.cachedNewborn = false;
-                //SimpleBackstoryDef customBackstoryDef = null;
+                SimpleBackstoryDef backstoryDef = null;
                 foreach (var backstory in pawn.story.AllBackstories)
                 {
-                    cachedSimpleBackstoryDef = backstory.GetDef();
-                }
-                // Set Age
-                if (cachedSimpleBackstoryDef != null)
-                {
-                    bool flag1 = false;
-                    bool flag2 = false;
-                    if (cachedSimpleBackstoryDef.bioAgeRange.Average >= 0)
+                    backstoryDef = backstory.GetDef();
+                    if (backstoryDef != null)
                     {
-                        request.FixedBiologicalAge = cachedSimpleBackstoryDef.bioAgeRange.RandomInRange;
-                        flag1 = true;
+                        // set age
+                        bool flag1 = false;
+                        bool flag2 = false;
+                        if (backstoryDef.bioAgeRange.Average >= 0)
+                        {
+                            request.FixedBiologicalAge = backstoryDef.bioAgeRange.RandomInRange;
+                            flag1 = true;
+                        }
+                        if (backstoryDef.chronoAgeRange.Average >= 0)
+                        {
+                            request.FixedChronologicalAge = flag1 ? request.FixedBiologicalAge + backstoryDef.chronoAgeRange.RandomInRange : pawn.ageTracker.AgeBiologicalYearsFloat + backstoryDef.chronoAgeRange.RandomInRange;
+                            flag2 = true;
+                        }
+                        if (flag1 || flag2)
+                        {
+                            AccessTools.Method(typeof(PawnGenerator), "GenerateRandomAge").Invoke(null, new object[] { pawn, request });
+                        }
+                        // set gender
+                        if (backstoryDef.maleChance >= 0f)
+                        {
+                            pawn.gender = Rand.Chance(backstoryDef.maleChance) ? Gender.Male : Gender.Female;
+                            request.FixedGender = pawn.gender;
+                        }
+                        else
+                        {
+                            pawn.gender = Rand.Chance(thingDef.raceAddonSettings.basicSetting.maleChance) ? Gender.Male : Gender.Female;
+                            request.FixedGender = pawn.gender;
+                        }
                     }
-                    if (cachedSimpleBackstoryDef?.chronoAgeRange.Average >= 0)
-                    {
-                        request.FixedChronologicalAge = flag1 ? request.FixedBiologicalAge + cachedSimpleBackstoryDef.chronoAgeRange.RandomInRange : pawn.ageTracker.AgeBiologicalYearsFloat + cachedSimpleBackstoryDef.chronoAgeRange.RandomInRange;
-                        flag2 = true;
-                    }
-                    if (flag1 || flag2)
-                    {
-                        AccessTools.Method(typeof(PawnGenerator), "GenerateRandomAge").Invoke(null, new object[] { pawn, request });
-                    }
-                }
-                // Set Gender
-                if (cachedSimpleBackstoryDef?.maleChance >= 0f)
-                {
-                    pawn.gender = Rand.Chance(cachedSimpleBackstoryDef.maleChance) ? Gender.Male : Gender.Female;
-                }
-                else
-                {
-                    pawn.gender = Rand.Chance(thingDef.raceAddonSettings.basicSetting.maleChance) ? Gender.Male : Gender.Female;
                 }
                 // Fix Name
                 pawn.Name = PawnBioAndNameGenerator.GeneratePawnName(pawn, NameStyle.Full, request.FixedLastName);
                 // Choose AppearanceDef
                 AppearanceDef appearanceDef = null;
-                if (cachedSimpleBackstoryDef?.appearances?.GetAppearanceDef(pawn) is var def && def != null)
+                if (backstoryDef?.appearances?.GetAppearanceDef(pawn) is var def && def != null)
                 {
                     appearanceDef = def;
                 }
@@ -156,15 +156,12 @@ namespace Garam_RaceAddon
     [HarmonyPatch("GeneratePawn", new[] { typeof(PawnGenerationRequest) })]
     public static class GeneratePawn
     {
-        private static PawnKindDef cachedOriginalPawnKindDef = null;
-
         [HarmonyPriority(int.MaxValue)]
         [HarmonyPrefix]
         public static bool Prefix(ref PawnGenerationRequest request)
         {
             if (!request.Newborn)
             {
-                cachedOriginalPawnKindDef = request.KindDef;
                 request.KindDef = RaceAddon.GetReplacedPawnKindDef(request.KindDef);
             }
             return true;
@@ -188,25 +185,21 @@ namespace Garam_RaceAddon
                     }
                 }
 
-                if (TryGenerateNewPawnInternal.cachedSimpleBackstoryDef?.forcedHediffs.Count > 0)
+                foreach (var backstory in __result.story.AllBackstories)
                 {
-                    foreach (var set in TryGenerateNewPawnInternal.cachedSimpleBackstoryDef?.forcedHediffs)
+                    if (backstory.GetDef() is var def && def != null && def.forcedHediffs.Count > 0)
                     {
-                        if (Rand.Chance(set.chance))
+                        foreach (var set in def.forcedHediffs)
                         {
-                            Hediff hediff = HediffMaker.MakeHediff(set.hediffDef, __result, set.targetPart.GetBodyPartRecord(__result.def.race.body));
-                            hediff.Severity = set.severity;
-                            __result.health.AddHediff(hediff);
+                            if (Rand.Chance(set.chance))
+                            {
+                                Hediff hediff = HediffMaker.MakeHediff(set.hediffDef, __result, set.targetPart.GetBodyPartRecord(__result.def.race.body));
+                                hediff.Severity = set.severity;
+                                __result.health.AddHediff(hediff);
+                            }
                         }
                     }
                 }
-
-                TryGenerateNewPawnInternal.cachedSimpleBackstoryDef = null;
-                if (cachedOriginalPawnKindDef != null)
-                {
-                    __result.ChangeKind(cachedOriginalPawnKindDef);
-                }
-                cachedOriginalPawnKindDef = null;
             }
         }
     }
