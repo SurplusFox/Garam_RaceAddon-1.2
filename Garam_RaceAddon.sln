@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Garam_RaceAddon", "Garam_RaceAddon\Garam_RaceAddon.csproj", "{F3E130BF-4E8F-442D-AA50-52F3C1229413}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3E130BF-4E8F-442D-AA50-52F3C1229413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3E130BF-4E8F-442D-AA50-52F3C1229413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3E130BF-4E8F-442D-AA50-52F3C1229413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3E130BF-4E8F-442D-AA50-52F3C1229413}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {562FB835-C25F-4BBB-9294-805A23F95D26}
+	EndGlobalSection
+EndGlobal
